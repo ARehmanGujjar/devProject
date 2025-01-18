@@ -1,22 +1,45 @@
 const mongoose=require("mongoose")
 const userSchema= new mongoose.Schema({
    firstName:{
-    type:String
+    type:String,
+    MinLength:4,
+    MaxLength:100,
+    required:true
    },
    lastName:{
     type:String
    },
    email:{
-    type:String
+    type:String,
+    required:true,
+    unique:true,
+    lowercase:true,
+    trim:true,
+
    },
    password:{
     type:String
    },
    age:{
-    type:Number
+    type:Number,
+    min:18,
    },
    gender:{
-    type:String
+    type:String,
+    validate(value){
+      if(!["male","female","others"].includes(value)){ 
+         throw new error("gender is not valid1");
+      }
+
+    }
+   },
+   about:{
+      type:String,
+      default:"default description"
+   },
+   profilePhoto:{
+      type:String,
+      default:"https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
    }
 
 })
