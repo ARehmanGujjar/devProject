@@ -48,9 +48,9 @@ app.delete("/user/del",async(req,res)=>{
 app.patch("/user/update",async(req,res)=>{
     const updatedEmail=req.body.email;
     try {
-        const updatedUser=await User.findOneAndUpdate({email:updatedEmail})
+        const updatedUser=await User.findOneAndUpdate({email:updatedEmail},{...req.body},{new:true})
         // res.send(delUser)
-        res.send("deleted")
+        res.send("updated"+updatedUser)
     } catch (error) {
         error.status(400).send("something went wrong!");
     }
