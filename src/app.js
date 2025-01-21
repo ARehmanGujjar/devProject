@@ -1,7 +1,9 @@
 const express=require("express");
 const { AdminAuth, UserAuth } = require("./middlewares/auth");
+const bcrypt=require("bcrypt")
 const connectDB=require("./config/database")
-const User=require("./models/User")
+const User=require("./models/User");
+const { validatingSignUp } = require("./utils/validations");
 const app=express();
 app.use(express.json());
 connectDB().then(()=>{
@@ -66,22 +68,41 @@ app.patch("/user/update/:email",async(req,res)=>{
         res.status(400).send("something went wrong!");
     }
 })
-
+app.post("/login",async(req,res)=>{
+    try { 
+    const {email,password}=req.body;
+    const user=await User.findOne({email:email})
+    if(!user){
+        throw new Error("email id not present")
+    }
+   
+        isPasswordValid=await bcrypt.compare(password,user.password)
+        if(isPasswordValid){
+            res.send("login successful!")
+        }else{
+            throw new Error("password not correct")
+        }
+        
+    } catch (error) {
+        res.status(400).send("invalid credentials");
+    }
+})
 app.post("/signup",async(req,res)=>{
-    // console.log(req)
-    // const userObj={
-    //     firstName:"arehman",
-    //     lastName:"gujjar2",
-    //     email:"arehman2@gmail.com",
-    //     password:"123456789",
-    //     gender:"male",
-    // }
-    const user=new User(req.body)
+    const {email,password,firstName,lastName}=req.body;
+    const passwordHash=await bcrypt.hash(password, 10)
+    // validatingSignUp(req);
+    const user=new User({
+        firstName,
+        lastName,
+        email,
+        password:passwordHash
+    })
+    
     try{
         await user.save();
         res.send("user added successfully!");
     }catch(err){
-        res.status(400).send("error saving the data"+err.message)
+        res.status(400).send("ERROR: "+err.message)
     }
     
 })
