@@ -13,6 +13,8 @@ connectDB().then(()=>{
 }).catch((error)=>{
     console.log("failed to connect to server")
 })
+
+
 app.get("/user",async(req,res)=>{
     const userEmail=req.body.email
     try{
@@ -42,17 +44,26 @@ app.delete("/user/del",async(req,res)=>{
         // res.send(delUser)
         res.send("deleted")
     } catch (error) {
-        error.status(400).send("something went wrong!");
+        res.status(400).send("something went wrong!");
     }
 })
-app.patch("/user/update",async(req,res)=>{
-    const updatedEmail=req.body.email;
+app.patch("/user/update/:email",async(req,res)=>{
+    const updatedEmail=req.params.email;
+    
     try {
+        const allowedUpdates=[
+            "photoURL","about","gender","age"
+        ]
+        // const isUpdateAllowed=Object.keys(data).every((k)=>allowedUpdates.includes(k))
         const updatedUser=await User.findOneAndUpdate({email:updatedEmail},{...req.body},{new:true})
         // res.send(delUser)
+        
+            // if(!isUpdateAllowed){
+            //     throw new error("update failed")
+            // }
         res.send("updated"+updatedUser)
     } catch (error) {
-        error.status(400).send("something went wrong!");
+        res.status(400).send("something went wrong!");
     }
 })
 
