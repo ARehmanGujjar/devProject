@@ -47,5 +47,17 @@ authRouter.post("/login",async(req,res)=>{
         res.status(400).send("invalid credentials");
     }
 })
+authRouter.post("/logout",async (req,res)=>{
+try {
+    res.cookie("token",null,{
+        expires:new Date(Date.now()),
+    })
+    res.send("logout success!");
+    
+} catch (error) {
+    res.status(400).send("failed to logout "+error.message)
+}
+
+})
 
 module.exports=authRouter;
