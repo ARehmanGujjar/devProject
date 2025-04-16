@@ -27,4 +27,13 @@ try {
     res.status(400).send("error while editing "+error.message)
 }
 })
+profileRouter.patch("/forgotPassword",UserAuth,async (req,res)=>{
+    try {
+        
+        
+
+    } catch (error) {
+        
+    }
+})
 module.exports=profileRouter
