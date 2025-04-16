@@ -18,6 +18,7 @@ const userSchema= new mongoose.Schema({
     unique:true,
     lowercase:true,
     trim:true,
+    index:true,
     validate(value){
      if(!validator.isEmail(value)){
       throw new Error("invalid email"+value)
@@ -40,12 +41,16 @@ const userSchema= new mongoose.Schema({
    },
    gender:{
     type:String,
-    validate(value){
-      if(!["male","female","others"].includes(value)){ 
-         throw new error("gender is not valid1");
-      }
+    enum:{
+      values:["male","female","others"],
+      message:`{VALUE} not defined`
+    },
+   //  validate(value){
+   //    if(!["male","female","others"].includes(value)){ 
+   //       throw new error("gender is not valid1");
+   //    }
 
-    }
+   //  }
    },
    about:{
       type:String,
