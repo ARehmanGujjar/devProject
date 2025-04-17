@@ -50,30 +50,41 @@ reqRouter.post("/request/send/:status/:toUserId", UserAuth, async (req, res) => 
     res.send(User.firstName + " sent the connection request!!")
 
 })
-reqRouter.post("/request/review/:status/:requestId",UserAuth,async (req,res)=>{
+
+
+reqRouter.post("/request/review/:status/:requestId", UserAuth, async (req, res) => {
     try {
-        const loggedinUser=req.user;
-        const {status,requestId}=req.params.status;
-        const allowedStatus=["accepted","rejected"]
-        if(!allowedStatus.includes(status)){
-            res.status(400).json({message:"not allowed"})
+        const loggedinUser = req.user;
+        const { status, requestId } = req.params;  
+        const allowedStatus = ["accepted", "rejected"];
+        
+        if (!allowedStatus.includes(status)) {
+            return res.status(400).json({ message: "status not allowed" });  
         }
-        if(!connectionRequest){
-            return res.status(400).json({message:"connection request not found"})
+
+        const connectionRequest = await ConnectionRequest.findOne({  
+            _id:requestId
+            ,toUserId: loggedinUser._id,
+            status: "interested"
+        });
+
+        if (!connectionRequest) {
+            return res.status(400).json({ message: "connection request not found" });
         }
-        const connectionRequest=await connectionRequest.findOne({
-            _id: requestId,
-            toUserId:loggedinUser._id,
-            status:"interested"
-        })
-        connectionRequest.status=status;
+
+        connectionRequest.status = status;
         await connectionRequest.save();
-        res.json({message:"connection request"+status,data})
+        
+        res.json({ 
+            message: "connection request " + status,
+            data: connectionRequest  
+        });
         
     } catch (error) {
-        res.status(400).send("error while accepting "+error)
+        res.status(400).send("error while accepting " + error.message); 
     }
-})
+});
+
 
 
 module.exports = reqRouter;
